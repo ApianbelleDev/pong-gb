@@ -106,7 +106,7 @@ MoveBall:
 	
 	cp a, 5
 	jp z, SetLeftVel
-	cp a, 160
+	cp a, 165
 	jp z, SetRightVel
 	ld [_OAMRAM + 9], a
 	
