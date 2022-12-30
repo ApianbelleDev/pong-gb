@@ -1,9 +1,9 @@
 all:
-	rgbasm -L -o main.o main.asm
-	rgbasm -L -o input.o input.asm
-	rgbasm -L -o header.o header.asm 
-	rgblink -o Pong.gb *.o
-	rgbfix -v -p 0xFF Pong.gb
-	sameboy Pong.gb
+	rgbasm -L -o obj/main.o src/main.asm
+	rgbasm -L -o obj/input.o src/input.asm
+	rgbasm -L -o obj/header.o src/header.asm 
+	rgblink -o bin/Snake.gb obj/*.o
+	rgbfix -v -p 0xFF bin/Snake.gb
+	sameboy bin/Snake.gb
 clean:
-	rm /build/*.gb /Build/*.o
+	rm bin/*.gb obj/*.o

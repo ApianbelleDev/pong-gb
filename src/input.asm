@@ -1,4 +1,4 @@
-INCLUDE "hardware.inc"
+INCLUDE "src/hardware.inc"
 
 SECTION "Input Data", WRAM0
 wCurKeys:: db
