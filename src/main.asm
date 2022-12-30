@@ -25,7 +25,8 @@ ClearOam:
     ; Initialize variables
     ld a, 1
     ld [wBallYVelocity], a
-    
+
+    ;commit test
     ld a, -1
     ld [wBallXVelocity], a
     
