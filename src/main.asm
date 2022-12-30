@@ -102,14 +102,10 @@ MoveBall:
 	ld b, a
 	ld a, [wBallXVelocity]
 	add a, b
-
 	
 	cp a, 5
 	jp z, SetLeftVel
-
-	ld a, [_OAMRAM]
-	ld b, a
-	cp a, b
+	cp a, 160
 	jp z, SetRightVel
 	ld [_OAMRAM + 9], a
 	
