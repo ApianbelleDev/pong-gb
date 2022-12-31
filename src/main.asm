@@ -119,21 +119,7 @@ SetYPos:
     add a, b
     ld [_OAMRAM  + 8], a
     jr SetXPos
-
-CheckLeft:
-    cp a, 10 ; Did the ball hit the bottom of the screen?
-    jr nz, CheckRight
-    ld a, -1
-    ld [wBallXVelocity], a
-    jr SetXPos
-
-CheckRight:
-    cp a, 153 ; Did the ball hit the top of the screen?
-    jr nz, SetXPos
-    ld a, 1
-    ld [wBallXVelocity], a
-    jr SetXPos
-
+    
 SetXPos:
     ld a, [_OAMRAM + 9]
     ld b, a
