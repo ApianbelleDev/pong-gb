@@ -1,6 +1,6 @@
 INCLUDE "src/hardware.inc" 
 
-SECTION "Start", ROMX
+SECTION "Start", ROM0
 
 EntryPoint::
 	; Do not turn the LCD off outside of VBlank
@@ -26,7 +26,7 @@ ClearOam:
     ld a, 1
     ld [wBallYVelocity], a
 
-    ;commit test
+    
     ld a, -1
     ld [wBallXVelocity], a
     
@@ -87,31 +87,61 @@ WaitVBlank2:
     ld a, [rLY]
     cp 144
     jp c, WaitVBlank2
+    call Input
+    call MoveBall
+    call MovePaddle
+    jp Main
+    
 MoveBall:
-	ld a, [_OAMRAM + 8]
-	ld b, a
-	ld a, [wBallYVelocity] ; wBallYVelocity is set to 1 in the init code.
-	add a, b
-	
-	cp a, 153 ; Did the ball hit the bottom of the screen?
-	jp z, SetUpwardsVel
-	cp a, 10 ; Did the ball hit the top of the screen?
-	jp z, SetDownwardsVel
-	ld [_OAMRAM  + 8], a
+    ld a, [_OAMRAM + 8]
+    ld b, a
+    ld a, [wBallYVelocity] ; wBallYVelocity is set to 1 in the init code.
+    add a, b
+    
+CheckBottom:
+    cp a, 153 ; Did the ball hit the bottom of the screen?
+    jr nz, CheckTop
+    ld a, -1
+    ld [wBallYVelocity], a
+    jr SetYPos
 
-	ld a, [_OAMRAM + 9]
-	ld b, a
-	ld a, [wBallXVelocity]
-	add a, b
-	
-	cp a, 5
-	jp z, SetLeftVel
-	cp a, 165
-	jp z, SetRightVel
-	ld [_OAMRAM + 9], a
-	
-	call Input
+CheckTop:
+    cp a, 10 ; Did the ball hit the top of the screen?
+    jr nz, SetYPos
+    ld a, 1
+    ld [wBallYVelocity], a
+    jr SetYPos
 
+SetYPos:
+    ld a, [_OAMRAM + 8]
+    ld b, a
+    ld a, [wBallYVelocity]
+    add a, b
+    ld [_OAMRAM  + 8], a
+    jr SetXPos
+
+CheckLeft:
+    cp a, 10 ; Did the ball hit the bottom of the screen?
+    jr nz, CheckRight
+    ld a, -1
+    ld [wBallXVelocity], a
+    jr SetXPos
+
+CheckRight:
+    cp a, 153 ; Did the ball hit the top of the screen?
+    jr nz, SetXPos
+    ld a, 1
+    ld [wBallXVelocity], a
+    jr SetXPos
+
+SetXPos:
+    ld a, [_OAMRAM + 9]
+    ld b, a
+    ld a, [wBallXVelocity]
+    add a, b
+    ld [_OAMRAM  + 9], a
+    ret
+MovePaddle:
 ; First, check if the up button is pressed.
 CheckUp:
 	ld a, [wCurKeys]
@@ -122,47 +152,25 @@ Up:
 	dec a
 	; If we've already hit the top of the screen, don't move
 	cp a, 15
-	jp z, Main
+	ret z
 	ld [_OAMRAM], a
-	jp Main
 ; Then check the down button
 CheckDown:
 	ld a, [wCurKeys]
 	and a, PADF_DOWN
-	jp z, Main
+	ret z
 Down:
 	ld a, [_OAMRAM]
 	inc a 
 	; If we've already hit the bottom of the screen, don't move
 	cp a, 145 
-	jp z, Main
+	ret z
 	ld [_OAMRAM], a 
-	jp Main
+	ret
 	
 ; --------------------------------------------------------------------------------------------------------------
 ; Ball to screen collision
 ; --------------------------------------------------------------------------------------------------------------
-SetUpwardsVel:
-	ld a, 0
-	dec a
-	ld [wBallYVelocity], a
-	jp Main
-SetDownwardsVel:
-	ld a, 0
-	inc a
-	ld [wBallYVelocity], a
-	jp Main
-SetLeftVel:
-	ld a, 0
-	inc a
-	ld [wBallXVelocity], a
-	jp Main
-SetRightVel:
-	ld a, 0
-	dec a
-	ld [wBallXVelocity], a
-	jp Main
-
 	
 ; Copy bytes from one area to another.
 ; @param de: Source
