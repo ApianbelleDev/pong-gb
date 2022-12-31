@@ -14,7 +14,7 @@ INCDIRS  = src/ src/include/
 WARNINGS = all extra
 ASFLAGS  = -L -p 0xFF $(addprefix -i,$(INCDIRS)) $(addprefix -W,$(WARNINGS))
 LDFLAGS  = -p 0xFF
-FIXFLAGS = -p 0xFF -v -k "AB" -l 0x33 -n 0 -t "Pong"
+FIXFLAGS = -p 0xFF -v -k "BM" -l 0x33 -n 0 -t "Pong"
 
 SRCS := $(shell find src -name '*.asm')
 
