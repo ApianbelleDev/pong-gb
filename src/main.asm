@@ -112,14 +112,28 @@ CheckTop:
     ld [wBallYVelocity], a
     jr SetYPos
 
+CheckPaddleX:
+	ld b, a
+	ld a, [wP_PaddleXPos]
+	cp a, b ; Did the ball hit the Paddle's X Position?
+	jr nz, SetXPos
+	ld a, -1
+	ld [wBallXVelocity], a
+	jr SetXPos
+CheckPaddleY:
+	ld b, a
+	ld a, [wP_PaddleYPos]
+	cp a, b
+	jr nz, SetXPos
+	ld a, 1
+	ld [wBallXVelocity], a
+	jr SetXPos  
 SetYPos:
     ld a, [_OAMRAM + 8]
     ld b, a
     ld a, [wBallYVelocity]
     add a, b
     ld [_OAMRAM  + 8], a
-    jr SetXPos
-    
 SetXPos:
     ld a, [_OAMRAM + 9]
     ld b, a
@@ -136,6 +150,10 @@ CheckUp:
 Up:
 	ld a, [_OAMRAM]
 	dec a
+	ld b, a
+	ld a, [wP_PaddleYPos]
+	dec a
+	ld a, b
 	; If we've already hit the top of the screen, don't move
 	cp a, 15
 	ret z
@@ -148,6 +166,10 @@ CheckDown:
 Down:
 	ld a, [_OAMRAM]
 	inc a 
+	ld b, a
+	ld a, [wP_PaddleYPos]
+	inc a
+	ld a, b
 	; If we've already hit the bottom of the screen, don't move
 	cp a, 145 
 	ret z
@@ -172,25 +194,22 @@ Memcpy:
     jp nz, Memcpy
     ret
 
-
-	
-
 Paddle:
 	dw `00033000
-	dw `00322300
-	dw `00322300
-	dw `00322300
-	dw `00322300
-	dw `00322300
-	dw `00322300
-	dw `00322300
-	dw `00322300
-	dw `00322300
-	dw `00322300
-	dw `00322300
-	dw `00322300
-	dw `00322300
-	dw `00322300
+	dw `00311300
+	dw `00312300
+	dw `00312300
+	dw `00312300
+	dw `00312300
+	dw `00312300
+	dw `00312300
+	dw `00312300
+	dw `00312300
+	dw `00312300
+	dw `00312300
+	dw `00312300
+	dw `00312300
+	dw `00312300
 	dw `00033000
 PaddleEnd:
 Ball:
