@@ -110,37 +110,60 @@ CheckTop:
     jr nz, SetYPos
     ld a, 1
     ld [wBallYVelocity], a
-    jr SetYPos
-
-CheckPaddleX:
-	ld b, a
-	ld a, [wP_PaddleXPos]
-	cp a, b ; Did the ball hit the Paddle's X Position?
-	jr nz, SetXPos
-	ld a, -1
-	ld [wBallXVelocity], a
-	jr SetXPos
-CheckPaddleY:
-	ld b, a
-	ld a, [wP_PaddleYPos]
-	cp a, b
-	jr nz, SetXPos
-	ld a, 1
-	ld [wBallXVelocity], a
-	jr SetXPos  
+    jr SetYPos 
+CheckPaddle:
+	ld a, [_OAMRAM + 9]
+	 ld a, b
+	 ld a, [wP_PaddleXPos]
+	 cp a, b
+	 jr z, Collision
+	
+	 ld a, [_OAMRAM + 8]
+	 ld b, a
+	 ld a, [wP_PaddleYPos]
+	 cp a, b
+	 jr nc, NoCollision
+	 add a, 14
+	 cp a, b
+	 jr nc, Collision
+	;fall through
 SetYPos:
     ld a, [_OAMRAM + 8]
     ld b, a
     ld a, [wBallYVelocity]
     add a, b
     ld [_OAMRAM  + 8], a
+MoveBallX:
+	ld a, [_OAMRAM + 9]
+	ld b, a
+	ld a, [wBallXVelocity]
+	jr SetXPos
+CheckRight:
+    cp a, 153 ; Did the ball hit the bottom of the screen?
+    jr nz, SetXPos
+    ld a, -1
+    ld [wBallXVelocity], a
+    jr SetYPos
+.checkPaddle:
+	call CheckPaddle ; Did the ball hit the paddle?
+    jr nc, SetYPos
+    ld a, [wBallYVelocity] ; Negate the velocity
+    cpl
+    inc a
+    ld [wBallYVelocity], a
 SetXPos:
-    ld a, [_OAMRAM + 9]
-    ld b, a
-    ld a, [wBallXVelocity]
-    add a, b
-    ld [_OAMRAM  + 9], a
-    ret
+	ld a, [_OAMRAM + 9]
+	ld b, a
+	ld a, [wBallXVelocity]
+	add a, b
+	ld [_OAMRAM +  9], a
+	ret
+NoCollision:
+	ret
+	scf
+Collision:
+	or a ; Clear the carry flag so that collision can be processed
+	ret
 MovePaddle:
 ; First, check if the up button is pressed.
 CheckUp:
